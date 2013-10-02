@@ -4,3 +4,7 @@
 *.jar
 *.war
 *.ear
+/bin
+/target
+
+temp/Untitled20.ditamap
