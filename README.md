@@ -3,6 +3,14 @@ dita-utilities
 
 Random utilities for doing things with DITA, mostly XSLT transforms
 
+Code examples
+-------------
+
+### Excel XML 2004 format to DITA table
+
+In: src/xslt/excel-xml-to-dita-table
+An example on how to convert a Excel XML 2004 to a DITA table
+
 
 Submodules
 ----------
