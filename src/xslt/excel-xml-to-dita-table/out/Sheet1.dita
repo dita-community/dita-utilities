@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept
+  PUBLIC "-//OASIS//DTD DITA Concept//EN" "technicalContent/dtd/concept.dtd">
+<concept id="concept_Sheet1">
+   <title>Sheet1</title>
+   <shortdesc/>
+   <conbody>
+      <table frame="all" colsep="1" id="table_Sheet1">
+         <title>Sheet1</title>
+         <tgroup cols="3">
+            <colspec colname="c0" colnum="0" colwidth="1.0*"/>
+            <colspec colname="c1" colnum="1" colwidth="1.0*"/>
+            <colspec colname="c2" colnum="2" colwidth="1.0*"/>
+            <thead>
+               <row>
+                  <entry>First Name</entry>
+                  <entry>Last Name</entry>
+                  <entry>Points</entry>
+               </row>
+            </thead>
+            <tbody>
+               <row>
+                  <entry>Jill</entry>
+                  <entry>Smith</entry>
+                  <entry>50</entry>
+               </row>
+               <row>
+                  <entry>Eve</entry>
+                  <entry>Jackson</entry>
+                  <entry>94</entry>
+               </row>
+               <row>
+                  <entry>John</entry>
+                  <entry>Doe</entry>
+                  <entry>80</entry>
+               </row>
+               <row>
+                  <entry>Adam</entry>
+                  <entry>Johnson</entry>
+                  <entry>67</entry>
+               </row>
+            </tbody>
+         </tgroup>
+      </table>
+   </conbody>
+</concept>
