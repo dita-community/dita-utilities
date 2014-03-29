@@ -7,6 +7,20 @@
   exclude-result-prefixes="xs xd relpath exslt-random"
   version="2.0">
   
+  <!-- =============================================================
+       Transform to generate arbitrary numbers of maps and topics.
+       Uses data files to populate the topics with distinguishing
+       content, e.g., words randomly selected from the words.xml
+       file (a list of about 236,000 English words).
+       
+       The input to the transform is the template topic. The direct
+       output is a single map document that includes each generated
+       topic.
+       
+       Author: W. Eliot Kimber
+       May be used without restriction
+       ============================================================= -->
+  
   <xsl:import href="../net.sourceforge.dita4publishers.common.xslt/xsl/lib/relpath_util.xsl"/>
   <xsl:param name="start" as="xs:string"
     select="'1'"
@@ -32,6 +46,10 @@
   <xsl:variable name="wordCount" as="xs:integer" select="count($words/*/*)"/>
   
   <xsl:output
+    doctype-public="-//OASIS//DTD DITA Map//EN"
+    doctype-system="map.dtd"
+  />
+  <xsl:output
     name="topic"
     doctype-public="-//OASIS//DTD DITA Topic//EN"
     doctype-system="topic.dtd"
@@ -42,6 +60,7 @@
       select="relpath:getNamePart(document-uri(.))"
     />
     <xsl:variable name="templateDoc" select="." as="document-node()"/>
+    <map><title>Generated Topics Map: <xsl:value-of select="current-dateTime()"/></title>
     <xsl:for-each select="$startNum to ($numToGenerate + $startNum)">
       <xsl:variable name="numberFormatted" as="xs:string"
         select="format-number(., '000000000')"
@@ -59,21 +78,25 @@
         else ."
         />
 <!--      <xsl:message> + [DEBUG] wordIndex="<xsl:value-of select="$wordIndex"/></xsl:message>-->
-      <xsl:message> + [INFO] Generating result document "<xsl:value-of select="concat($baseFilename, '-', $numberFormatted, '.xml')"/></xsl:message>
-      <xsl:result-document href="{concat($chunkName, '/', $baseFilename, '-', $numberFormatted, '.xml')}" format="topic"
+      <xsl:variable name="docUri" as="xs:string" 
+        select="concat($chunkName, '/', $baseFilename, '-', $numberFormatted, '.xml')"/>
+      <xsl:message> + [INFO] Generating result document "<xsl:value-of select="$docUri"/></xsl:message>
+      <xsl:result-document href="{$docUri}" format="topic"
         >
         <xsl:apply-templates select="$templateDoc/*">
           <xsl:with-param name="num" as="xs:integer" tunnel="yes" select="."/>
           <xsl:with-param name="wordIndex" as="xs:integer" tunnel="yes" select="$wordIndex"/>
         </xsl:apply-templates>
       </xsl:result-document>
+      <topicref href="{$docUri}"/>
     </xsl:for-each>
+    </map>
   </xsl:template>
   
   <xsl:template match="*[not(*) and contains(., '^')]">
     <xsl:param name="num" as="xs:integer" tunnel="yes"/>    
     <xsl:param name="wordIndex" as="xs:integer" tunnel="yes"/>
-    <xsl:message> + [DEBUG] Element with no subelements</xsl:message>
+<!--    <xsl:message> + [DEBUG] Element with no subelements</xsl:message>-->
     <xsl:copy copy-namespaces="no">
       <xsl:apply-templates select="@*"/>
       <xsl:analyze-string select="." regex="\^(.+)\^">
