@@ -7,4 +7,5 @@
 /bin
 /target
 
+src/xslt/generate-large-dataset/topics/
 temp/Untitled20.ditamap

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
+<topic
+  id="topic-id">
+  <title>Generic Topic ^num^</title>
+  <body>
+    <p>This is generic topic ^num^.</p>
+    <p>Now is the time for all good men to come to the aid of their party.</p>
+    <p>A term: ^term^</p>
+  </body>
+</topic>
