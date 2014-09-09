@@ -9,8 +9,8 @@
   exclude-result-prefixes="xs xd relpath local df ditaarch"
   version="2.0">
 
-    <xsl:import href="../org.dita4publishers.common.xslt/xsl/lib/relpath_util.xsl"/>
-    <xsl:import href="../org.dita4publishers.common.xslt/xsl/lib/dita-support-lib.xsl"/>
+    <xsl:import href="../org.dita-community.common.xslt/xsl/relpath_util.xsl"/>
+    <xsl:import href="../org.dita-community.common.xslt/xsl/dita-support-lib.xsl"/>
 
   <xd:doc scope="stylesheet">
     <xd:desc>
