@@ -21,7 +21,7 @@
        May be used without restriction
        ============================================================= -->
   
-  <xsl:import href="../net.sourceforge.dita4publishers.common.xslt/xsl/lib/relpath_util.xsl"/>
+  <xsl:import href="../org.dita-community.common.xslt/xsl/relpath_util.xsl"/>
   <xsl:param name="start" as="xs:string"
     select="'1'"
   />

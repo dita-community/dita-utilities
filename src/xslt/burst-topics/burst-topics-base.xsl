@@ -27,8 +27,8 @@
        May be used without restriction
        ================================================= -->
   
-  <xsl:import href="../net.sourceforge.dita4publishers.common.xslt/xsl/lib/dita-support-lib.xsl"/>
-  <xsl:import href="../net.sourceforge.dita4publishers.common.xslt/xsl/lib/relpath_util.xsl"/>
+  <xsl:import href="../org.dita-community.common.xslt/xsl/dita-support-lib.xsl"/>
+  <xsl:import href="../org.dita-community.common.xslt/xsl/relpath_util.xsl"/>
   
   <xsl:param name="outdir" as="xs:string" select="'burst-result'"/>
   <xsl:param name="mapFormat" as="xs:string" select="'map'"/>
