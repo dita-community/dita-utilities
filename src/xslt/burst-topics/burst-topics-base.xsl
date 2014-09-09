@@ -33,6 +33,8 @@
   <xsl:param name="outdir" as="xs:string" select="'burst-result'"/>
   <xsl:param name="mapFormat" as="xs:string" select="'map'"/>
   
+  <xsl:output omit-xml-declaration="yes"/>
+  
   <xsl:output name="map"
     doctype-public="-//OASIS//DTD DITA Map//EN"
     doctype-system="map.dtd"
@@ -167,7 +169,7 @@
       select="relpath:getNamePart(document-uri(root($topicElem)))"
     />
     <xsl:variable name="result" 
-      select="if ($topicElem/ancestor::*[df:class(., 'topic/topic')]) 
+      select="if ($topicElem/ancestor::*[df:class(., 'topic/topic')] | $topicElem/parent::dita) 
       then concat($filenameBase, '-', $topicElem/@id, '.dita')
       else concat($filenameBase, '.dita')" 
       as="xs:string"/>
