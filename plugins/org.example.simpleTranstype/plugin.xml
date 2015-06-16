@@ -1,0 +1,55 @@
+<plugin id="org.example.simpleTranstype">
+  <!-- ==========================================
+       This plugin is a very simple plugin that
+       defines a new transformation type that 
+       does nothing but call another transformation
+       type.
+       
+       It's useful as the basis for a transformation type
+       that does nothing or very little, such as statically setting
+       runtime options on the base transformation type.
+       
+       To adapt this to your own use, change the following:
+       
+       1. Change the @id value on the <plugin> element to
+          reflect your plugin name. It needs to be unique
+          among all the plugins deployed in your Open Toolkit
+          instance.
+          
+       2. Change the transtype name on the dita.conductor.transtype.check
+          <feature> element (@value attribute).
+          
+       3. Change the transtype name on the <transtype> element (@name attribute)
+       
+       4. Change the @extends value on the <transtype> element to reflect
+          the name of the transformation type this plugin is extending.
+          
+       5. In the build.xml file, change the @name attribute on the
+          <project> element to reflect your plugin (can be the same
+          as the @id value in the <plugin> element).
+          
+       6. In the build.xml file, change the @name attribute on the
+          <target> element to reflect your plugin (it must start
+          with "dita2").
+          
+       7. In the build.xml file, change the @target value on the <antcall>
+          element to reflect the transformation type you are extending.
+       
+       ================================================ -->
+
+  <feature extension="dita.conductor.transtype.check" value="simpleTranstype" type="txt"/>
+  <feature extension="dita.conductor.target.relative" value="build.xml" type="file"/>
+  
+
+  <transtype name="simpleTranstype" extends="xhtml" desc="Simple Transtype Example">
+    <!-- You can put parameters here to describe the user-settable parameters
+         for your transtype.
+         
+    <param name="parameter.name"
+      desc="Parameter description" type="enum">
+      <val>value1</val>
+      <val>value2</val>
+    </param>
+   -->
+  </transtype>
+</plugin>

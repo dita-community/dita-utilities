@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="org.example.simpleTranstype">
+  
+  <target name="dita2simpleTranstype">
+    <antcall target="dita2xhtml">
+      <!-- Put statically-defined properties here using
+           param elements:
+
+           <param name="paramname" value="paramvalue"/>
+
+        -->
+    </antcall>
+  </target>
+  
+</project>
