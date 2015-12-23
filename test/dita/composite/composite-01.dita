@@ -13,6 +13,8 @@
     <conbody>
       <p>This is topic 02 of composite 1.</p>
       <p>Crossref to topic 01: <xref href="#topic_zdk_stw_k5" format="dita"/>.</p>
+      <p>Crossref to a nested topic: <xref href="#task_vcm_f5w_k5/step01" format="dita">step 01 in
+          subtask 04-01 </xref>.</p>
     </conbody>
   </concept>
   <concept id="concept_dl5_wtw_k5">
@@ -37,7 +39,7 @@
         <title>Nested topic 04-01</title>
         <taskbody>
           <steps-unordered id="steps-unordered_wcm_f5w_k5">
-            <step>
+            <step id="step01">
               <cmd>Do another thing</cmd>
             </step>
           </steps-unordered>

@@ -324,7 +324,7 @@
                 <xsl:message> - [WARN]   Failed to resolve @href "<xsl:value-of select="$href"/>" to an element. Not rewriting element.</xsl:message>
               </xsl:when>
               <xsl:otherwise>
-                <xsl:sequence select="$targetElement/ancestor-or-self::*[df:class(., 'topic/topic')][1]"/>
+                <xsl:sequence select="($targetElement/ancestor-or-self::*[df:class(., 'topic/topic')][local:isBurstTopic(.)])[last()]"/>
               </xsl:otherwise>
             </xsl:choose>
           </xsl:variable>
