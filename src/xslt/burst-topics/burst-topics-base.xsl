@@ -41,6 +41,7 @@
   <xsl:output omit-xml-declaration="yes"/>
   
   <xsl:output name="map"
+    method="xml"
     doctype-public="-//OASIS//DTD DITA Map//EN"
     doctype-system="map.dtd"
     indent="yes"
@@ -78,7 +79,8 @@
     <!-- Generate the map that will refer to all the topics once they 
          are burst:         
       -->
-    <xsl:message> + [INFO] Generating map document "<xsl:value-of select="$mapUri"/>"...</xsl:message>
+    <xsl:message> + [INFO] Generating map document "<xsl:value-of select="$mapUri"/>", format="<xsl:sequence select="$mapFormat"/>"...</xsl:message>
+    <xsl:message> + [DEBUG] mapFormat="<xsl:sequence select="$mapFormat"/>"</xsl:message>
     <xsl:result-document href="{$mapUri}" format="{$mapFormat}">
       <map>
         <xsl:apply-templates mode="make-map">
@@ -162,16 +164,44 @@
               [@scope = ('local') or not(@scope)]
               [@format = 'dita' or not(@format)]
               [@href]">
-    <xsl:param name="doDebug" as="xs:boolean" tunnel="yes" select="false()"/>
-    
+    <xsl:param name="doDebug" as="xs:boolean" tunnel="yes" select="false()"/>    
     <!-- Result URI for the topic that contains this element. -->
     <xsl:param name="resultUri" as="xs:string" tunnel="yes"/>
     
-    <!-- Rewrite pointers to topics -->
-    <xsl:variable name="href" as="xs:string" select="@href"/>
+    <xsl:variable name="resultAtt" as="attribute()">     
+      <xsl:call-template name="rewritePointer">
+        <xsl:with-param name="doDebug" as="xs:boolean" tunnel="yes" select="$doDebug"/>
+        <xsl:with-param name="resultUri" as="xs:string" tunnel="yes" select="$resultUri"/>
+        <xsl:with-param name="origAtt" as="attribute()" select="@*[name(.) = 'href']"/>   
+      </xsl:call-template>
+    </xsl:variable>
+    
+    <xsl:copy copy-namespaces="no">
+      <xsl:sequence select="$resultAtt"/>
+      <xsl:apply-templates select="@*, node()" mode="#current">
+        <xsl:with-param name="doDebug" as="xs:boolean" tunnel="yes" select="$doDebug"/>
+      </xsl:apply-templates>
+    </xsl:copy>
+    
+  </xsl:template>
+
+  <!-- Rewrites an attribute that is an href pointer to a topic or
+       element within a topic.
+    -->
+  <xsl:template name="rewritePointer">
+    <xsl:param name="doDebug" as="xs:boolean" tunnel="yes" select="false()"/>
+    <xsl:param name="resultUri" as="xs:string" tunnel="yes"/>
+    <xsl:param name="origAtt" as="attribute()"/>
+    
+    <xsl:variable name="thisTopic" as="element()"
+      select="$origAtt/ancestor::*[df:class(., 'topic/topic')][1]"
+    />
+    <xsl:variable name="attName" as="xs:string" select="name($origAtt)"/>    
+    <xsl:variable name="href" as="xs:string" select="$origAtt"/>
     <xsl:variable name="fragID" as="xs:string?" select="relpath:getFragmentId($href)"/>
     <xsl:variable name="resourcePart" as="xs:string" select="relpath:getResourcePartOfUri($href)"/>
-    <xsl:variable name="thisTopicID" select="string(ancestor::*[df:class(., 'topic/topic')][1]/@id)"/>/>
+    
+    <xsl:variable name="thisTopicID" select="string($thisTopic/@id)"/>
     
     <!-- For the reference there are three possible cases:
       
@@ -191,17 +221,17 @@
          when the resulting topic will be the root of it's chunk. (Not doing that for now).
       -->
     
-    <xsl:variable name="hrefAtt" as="attribute(href)">      
+    <xsl:variable name="resultAtt" as="attribute()">      
       <xsl:choose>
         <xsl:when test="not($fragID) or 
                         tokenize($fragID, '/')[1] = ('.', $thisTopicID)">
           <!-- Target is same topic, no change -->
-          <xsl:sequence select="@href"/>
+          <xsl:sequence select="$origAtt"/>
         </xsl:when>
         <xsl:otherwise>
           <!-- Try to rewrite the pointer -->
           <xsl:variable name="targetElement" as="node()*" 
-            select="df:resolveTopicElementRef(., $href)"
+            select="df:resolveTopicElementRef($thisTopic, $href)"
           />
           <xsl:variable name="targetTopic" as="element()?">
             <xsl:choose>
@@ -224,22 +254,16 @@
               <xsl:variable name="targetHref" as="xs:string"
                 select="concat($relativeUri, '#', $fragID)"
               />
-              <xsl:attribute name="href" select="$targetHref"/>
+              <xsl:attribute name="{$attName}" select="$targetHref"/>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:sequence select="@href"/>
+              <xsl:sequence select="$origAtt"/>
             </xsl:otherwise>
           </xsl:choose>          
         </xsl:otherwise>
       </xsl:choose>    
     </xsl:variable>
-    
-    <xsl:copy copy-namespaces="no">
-      <xsl:sequence select="$hrefAtt"/>
-      <xsl:apply-templates select="@* except (@href), node()" mode="#current">
-        <xsl:with-param name="doDebug" as="xs:boolean" tunnel="yes" select="$doDebug"/>
-      </xsl:apply-templates>
-    </xsl:copy>
+    <xsl:sequence select="$resultAtt"/>
   </xsl:template>
   
   <xsl:template mode="copy-topic" match="*" priority="-1">
@@ -250,6 +274,16 @@
         select="@*, node()"
       />
     </xsl:copy>
+  </xsl:template>
+  
+  <xsl:template match="@conref" mode="copy-topic">
+    <xsl:variable name="resultAtt" as="attribute()">     
+      <xsl:call-template name="rewritePointer">
+        <xsl:with-param name="doDebug" as="xs:boolean" tunnel="yes" select="$doDebug"/>
+        <xsl:with-param name="origAtt" as="attribute()" select="."/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:sequence select="$resultAtt"/>
   </xsl:template>
   
   <xsl:template match="@class | @domains | @ditaarch:DITAArchVersion" mode="copy-topic">
