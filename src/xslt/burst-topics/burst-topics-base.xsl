@@ -96,7 +96,6 @@
          are burst:         
       -->
     <xsl:message> + [INFO] Generating map document "<xsl:value-of select="$mapUri"/>", format="<xsl:sequence select="$mapFormat"/>"...</xsl:message>
-    <xsl:message> + [DEBUG] mapFormat="<xsl:sequence select="$mapFormat"/>"</xsl:message>
     <!--<xsl:result-document href="{$mapUri}" format="{$mapFormat}">. This is a bug in Saxon 9.6.0.6, variable refs don't work. -->
     <xsl:result-document href="{$mapUri}" format="{'map'}">
       <map>
