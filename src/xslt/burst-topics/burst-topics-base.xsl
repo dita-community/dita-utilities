@@ -158,33 +158,7 @@
       />
     </xsl:copy>
   </xsl:template>
-  
-  <xsl:template mode="copy-topic"
-      match="*[df:class(., 'topic/xref')]
-              [@scope = ('local') or not(@scope)]
-              [@format = 'dita' or not(@format)]
-              [@href]">
-    <xsl:param name="doDebug" as="xs:boolean" tunnel="yes" select="false()"/>    
-    <!-- Result URI for the topic that contains this element. -->
-    <xsl:param name="resultUri" as="xs:string" tunnel="yes"/>
-    
-    <xsl:variable name="resultAtt" as="attribute()">     
-      <xsl:call-template name="rewritePointer">
-        <xsl:with-param name="doDebug" as="xs:boolean" tunnel="yes" select="$doDebug"/>
-        <xsl:with-param name="resultUri" as="xs:string" tunnel="yes" select="$resultUri"/>
-        <xsl:with-param name="origAtt" as="attribute()" select="@*[name(.) = 'href']"/>   
-      </xsl:call-template>
-    </xsl:variable>
-    
-    <xsl:copy copy-namespaces="no">
-      <xsl:sequence select="$resultAtt"/>
-      <xsl:apply-templates select="@*, node()" mode="#current">
-        <xsl:with-param name="doDebug" as="xs:boolean" tunnel="yes" select="$doDebug"/>
-      </xsl:apply-templates>
-    </xsl:copy>
-    
-  </xsl:template>
-
+ 
   <!-- Rewrites an attribute that is an href pointer to a topic or
        element within a topic.
     -->
@@ -192,6 +166,11 @@
     <xsl:param name="doDebug" as="xs:boolean" tunnel="yes" select="false()"/>
     <xsl:param name="resultUri" as="xs:string" tunnel="yes"/>
     <xsl:param name="origAtt" as="attribute()"/>
+    
+    <xsl:if test="$doDebug">
+      <xsl:message> + [DEBUG] rewritePointer: origAtt="<xsl:sequence select="$origAtt"/>"</xsl:message>
+      <xsl:message> + [DEBUG] rewritePointer: resultUri="<xsl:value-of select="$resultUri"/>"</xsl:message>
+    </xsl:if>
     
     <xsl:variable name="thisTopic" as="element()"
       select="$origAtt/ancestor::*[df:class(., 'topic/topic')][1]"
@@ -250,10 +229,16 @@
               <xsl:variable name="relativeUri" as="xs:string"
                 select="relpath:getRelativePath(relpath:getParent($resultUri), $targetTopicUri)"
               />
+              <xsl:if test="$doDebug">
+                <xsl:message> + [DEBUG] rewritePointer: relativeUri="<xsl:value-of select="$relativeUri"/>"</xsl:message>
+              </xsl:if>
               <!-- FIXME: May need to encode the URI. -->
               <xsl:variable name="targetHref" as="xs:string"
                 select="concat($relativeUri, '#', $fragID)"
               />
+              <xsl:if test="$doDebug">
+                <xsl:message> + [DEBUG] rewritePointer: targetHref="<xsl:value-of select="$targetHref"/>"</xsl:message>
+              </xsl:if>
               <xsl:attribute name="{$attName}" select="$targetHref"/>
             </xsl:when>
             <xsl:otherwise>
@@ -263,6 +248,9 @@
         </xsl:otherwise>
       </xsl:choose>    
     </xsl:variable>
+    <xsl:if test="$doDebug">
+      <xsl:message> + [DEBUG] rewriterPointer: resultAtt="<xsl:sequence select="$resultAtt"/>"</xsl:message>
+    </xsl:if>
     <xsl:sequence select="$resultAtt"/>
   </xsl:template>
   
@@ -277,6 +265,19 @@
   </xsl:template>
   
   <xsl:template match="@conref" mode="copy-topic">
+    <xsl:variable name="resultAtt" as="attribute()">     
+      <xsl:call-template name="rewritePointer">
+        <xsl:with-param name="doDebug" as="xs:boolean" tunnel="yes" select="$doDebug"/>
+        <xsl:with-param name="origAtt" as="attribute()" select="."/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:sequence select="$resultAtt"/>
+  </xsl:template>
+  
+  <xsl:template  mode="copy-topic"
+    match="*[@href][@scope = ('local') or not(@scope)]
+    [@format = 'dita' or not(@format)]/@href">
+    
     <xsl:variable name="resultAtt" as="attribute()">     
       <xsl:call-template name="rewritePointer">
         <xsl:with-param name="doDebug" as="xs:boolean" tunnel="yes" select="$doDebug"/>
