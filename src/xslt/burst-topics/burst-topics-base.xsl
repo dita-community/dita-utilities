@@ -34,6 +34,14 @@
   <xsl:param name="mapFormat" as="xs:string" select="'map'"/>
   <xsl:param name="debug" as="xs:string" select="'false'"/>
   
+  <xsl:param name="burstLevel" as="xs:string" select="'0'"/>
+  
+  <xsl:param name="burstLevelInt" as="xs:integer"
+     select="if ($burstLevel castable as xs:integer) 
+                then xs:integer($burstLevel) 
+                else 0"
+  />
+  
   <xsl:variable name="doDebug" as="xs:boolean" 
     select="matches($debug, '1|yes|true|on', 'i')"
   />
@@ -67,6 +75,14 @@
     <xsl:if test="$doDebug">
       <xsl:message> + [DEBUG] #default '/': Starting... </xsl:message>
     </xsl:if>
+    
+    <xsl:if test="not($burstLevel castable as xs:integer) ">
+      <xsl:message> - [WARN] Burst level specified as "<xsl:value-of select="$burstLevel"/>".</xsl:message>
+      <xsl:message> - [WARN] The burstLevel parameter must be an integer value of zero (0) or greater. Using value "0" (burst all).</xsl:message>
+    </xsl:if>
+    
+    <xsl:message> + [INFO] Burting. Burst level is "<xsl:value-of select="$burstLevelInt"/>"</xsl:message>
+    
     <xsl:variable name="outputDir" as="xs:string"
       select="relpath:newFile(relpath:getParent(document-uri(.)), $outdir)"
     />
@@ -81,7 +97,8 @@
       -->
     <xsl:message> + [INFO] Generating map document "<xsl:value-of select="$mapUri"/>", format="<xsl:sequence select="$mapFormat"/>"...</xsl:message>
     <xsl:message> + [DEBUG] mapFormat="<xsl:sequence select="$mapFormat"/>"</xsl:message>
-    <xsl:result-document href="{$mapUri}" format="{$mapFormat}">
+    <!--<xsl:result-document href="{$mapUri}" format="{$mapFormat}">. This is a bug in Saxon 9.6.0.6, variable refs don't work. -->
+    <xsl:result-document href="{$mapUri}" format="{'map'}">
       <map>
         <xsl:apply-templates mode="make-map">
           <xsl:with-param name="doDebug" as="xs:boolean" tunnel="yes" select="$doDebug"/>
@@ -101,7 +118,7 @@
        Mode make-map
        ================================ -->
   
-  <xsl:template mode="make-map" match="*[df:class(., 'topic/topic')]">
+  <xsl:template mode="make-map" match="*[df:class(., 'topic/topic')][local:isBurstTopic(.)]">
     <xsl:param name="doDebug" as="xs:boolean" tunnel="yes" select="false()"/>
     
     <xsl:variable name="topicFilename" as="xs:string" select="local:constructTopicFilename(.)"/>
@@ -123,26 +140,101 @@
        Mode make-topics
        ================================ -->
   
-  <xsl:template mode="make-topics" match="*[df:class(., 'topic/topic')]">
+  <xsl:template mode="make-topics" match="*[df:class(., 'topic/topic')][local:isBurstTopic(.)]" priority="10">
     <xsl:param name="doDebug" as="xs:boolean" tunnel="yes" select="false()"/>
     <xsl:param name="topicFormat" as="xs:string" select="name(.)"/>
-
+    
     <xsl:variable name="topicUri" as="xs:string"
       select="local:getTopicResultUri($outdir, .)"
     />
     
+    <!-- The nesting level of this topic: -->
+    <xsl:variable name="nestLevel" as="xs:integer" select="count(ancestor-or-self::*[df:class(., 'topic/topic')])"/>
+
+    <!-- This bit of indirection makes it easier to override the result-document
+         details and works around a bug with @format attribute value templates in 
+         Saxon 9.6.0.6.
+      -->
+    <xsl:apply-templates select="." mode="generateResultTopic">
+      <xsl:with-param name="doDebug" as="xs:boolean" tunnel="yes" select="false()"/>
+      <xsl:with-param name="topicUri" as="xs:string" select="$topicUri"/>
+      <xsl:with-param name="topicFormat" as="xs:string" select="$topicFormat"/>
+    </xsl:apply-templates>
+    
+    <xsl:if test="$burstLevelInt = 0 or $nestLevel lt $burstLevelInt">
+      <xsl:apply-templates mode="#current" select="*[df:class(., 'topic/topic')]">
+        <xsl:with-param name="doDebug" as="xs:boolean" tunnel="yes" select="$doDebug"/>
+      </xsl:apply-templates>
+    </xsl:if>
+        
+  </xsl:template>
+  
+  <xsl:template mode="generateResultTopic" match="topic">
+    <xsl:param name="topicUri" as="xs:string"/>
+    <xsl:param name="topicFormat" as="xs:string" select="name(.)"/>
+    
     <xsl:message> + [INFO] Generating topic "<xsl:value-of select="$topicUri"/></xsl:message>
-    <xsl:result-document href="{$topicUri}" format="{$topicFormat}">
+    <xsl:result-document href="{$topicUri}" format="topic">
       <xsl:apply-templates select="." mode="copy-topic">
         <xsl:with-param name="doDebug" as="xs:boolean" tunnel="yes" select="$doDebug"/>
         <xsl:with-param name="resultUri" as="xs:string" tunnel="yes" select="$topicUri"/>
       </xsl:apply-templates>
     </xsl:result-document>
     
-    <xsl:apply-templates mode="#current" select="*[df:class(., 'topic/topic')]"/>
+  </xsl:template>
+  
+  <!-- These templates set the @format value literally to work around a Saxon bug
+       with @format and variable references. -->
+  <xsl:template mode="generateResultTopic" match="concept">
+    <xsl:param name="topicUri" as="xs:string"/>
+    <xsl:param name="topicFormat" as="xs:string" select="name(.)"/>
+    
+    <xsl:message> + [INFO] Generating topic "<xsl:value-of select="$topicUri"/></xsl:message>
+    <xsl:result-document href="{$topicUri}" format="concept">
+      <xsl:apply-templates select="." mode="copy-topic">
+        <xsl:with-param name="doDebug" as="xs:boolean" tunnel="yes" select="$doDebug"/>
+        <xsl:with-param name="resultUri" as="xs:string" tunnel="yes" select="$topicUri"/>
+      </xsl:apply-templates>
+    </xsl:result-document>
     
   </xsl:template>
   
+  <xsl:template mode="generateResultTopic" match="reference">
+    <xsl:param name="topicUri" as="xs:string"/>
+    <xsl:param name="topicFormat" as="xs:string" select="name(.)"/>
+    
+    <xsl:message> + [INFO] Generating topic "<xsl:value-of select="$topicUri"/></xsl:message>
+    <xsl:result-document href="{$topicUri}" format="reference">
+      <xsl:apply-templates select="." mode="copy-topic">
+        <xsl:with-param name="doDebug" as="xs:boolean" tunnel="yes" select="$doDebug"/>
+        <xsl:with-param name="resultUri" as="xs:string" tunnel="yes" select="$topicUri"/>
+      </xsl:apply-templates>
+    </xsl:result-document>
+    
+  </xsl:template>
+  
+  <xsl:template mode="generateResultTopic" match="task">
+    <xsl:param name="topicUri" as="xs:string"/>
+    <xsl:param name="topicFormat" as="xs:string" select="name(.)"/>
+    
+    <xsl:message> + [INFO] Generating topic "<xsl:value-of select="$topicUri"/></xsl:message>
+    <xsl:result-document href="{$topicUri}" format="task">
+      <xsl:apply-templates select="." mode="copy-topic">
+        <xsl:with-param name="doDebug" as="xs:boolean" tunnel="yes" select="$doDebug"/>
+        <xsl:with-param name="resultUri" as="xs:string" tunnel="yes" select="$topicUri"/>
+      </xsl:apply-templates>
+    </xsl:result-document>
+    
+  </xsl:template>
+  
+  <!-- Topic that is not burst -->
+  <xsl:template mode="make-topics" match="*[df:class(., 'topic/topic')]">
+    <xsl:param name="doDebug" as="xs:boolean" tunnel="yes" select="false()"/>
+    
+    <xsl:apply-templates mode="copy-topic" select=".">
+      <xsl:with-param name="doDebug" as="xs:boolean" tunnel="yes" select="$doDebug"/>
+    </xsl:apply-templates>
+  </xsl:template>  
   
   
   <!-- ================================
@@ -152,10 +244,23 @@
   <xsl:template mode="copy-topic" match="*[df:class(., 'topic/topic')]">
     <xsl:param name="doDebug" as="xs:boolean" tunnel="yes" select="false()"/>
     
+    <xsl:variable name="nestLevel" as="xs:integer" select="count(ancestor-or-self::*[df:class(., 'topic/topic')])"/>
+    
     <xsl:copy copy-namespaces="no">
-      <xsl:apply-templates mode="#current"
-        select="@*, node() except (*[df:class(., 'topic/topic')])"
-      />
+      <xsl:choose>
+        <xsl:when test="$burstLevelInt = 0 or $nestLevel lt $burstLevelInt">
+          <!-- child topics will be burst. -->
+          <xsl:apply-templates mode="#current"
+            select="@*, node() except (*[df:class(., 'topic/topic')])"
+          />
+        </xsl:when>
+        <xsl:otherwise>
+          <!-- Child topics will not be burst -->
+          <xsl:apply-templates mode="#current"
+            select="@*, node()"
+          />          
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:copy>
   </xsl:template>
  
@@ -327,5 +432,23 @@
     <xsl:variable name="topicFilename" as="xs:string" select="local:constructTopicFilename($topic)"/>
     <xsl:variable name="result" select="relpath:newFile($outdir, $topicFilename)"/>
     <xsl:sequence select="$result"/>
+  </xsl:function>
+  
+  <!-- Return true if the topic should be burst -->
+  <xsl:function name="local:isBurstTopic" as="xs:boolean">
+    <xsl:param name="topic" as="element()"/>
+    
+    <xsl:choose>
+      <xsl:when test="$burstLevelInt = 0">
+        <xsl:sequence select="true()"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:variable name="nestLevel" as="xs:integer"
+          select="count($topic/ancestor::*[df:class(., 'topic/topic')])"
+        />
+        <xsl:sequence select="$nestLevel lt $burstLevelInt"/>
+      </xsl:otherwise>
+    </xsl:choose>
+    
   </xsl:function>
 </xsl:stylesheet>

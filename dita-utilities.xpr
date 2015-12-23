@@ -15,5 +15,6 @@
     </meta>
     <projectTree name="dita-utilities.xpr">
         <folder path="."/>
+        <folder path="../../workspace/"/>
     </projectTree>
 </project>
