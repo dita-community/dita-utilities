@@ -22,6 +22,7 @@
       <p>Conref to paragraph from topic 01:</p>
       <p conref="#topic_zdk_stw_k5/p01"/>
     </conbody>
+  </concept>
     <task id="task_u1z_15w_k5">
       <title>This is Topic 04 of Composite 01</title>
       <taskbody>
@@ -53,5 +54,4 @@
         </taskbody>
       </task>
     </task>
-  </concept>
 </dita>
