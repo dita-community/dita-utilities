@@ -50,7 +50,7 @@
 
   <xsl:template match="subsection">
     <xsl:next-match>
-      <xsl:with-param name="topicFormat" as="xs:string" select="'chapter'"/>
+      <xsl:with-param name="topicFormat" as="xs:string" select="'subsection'"/>
     </xsl:next-match>
   </xsl:template>
 
