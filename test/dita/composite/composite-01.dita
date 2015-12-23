@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dita PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<dita>
+  <topic id="topic_zdk_stw_k5">
+    <title>Topic 01 of Composite 01</title>
+    <body>
+      <p>This is topic 01 of composite 1</p>
+      <p id="p01">This is a paragraph to be used by reference.</p>
+    </body>
+  </topic>
+  <concept id="concept_gzr_ttw_k5">
+    <title>Topic 02 of Composite 01</title>
+    <conbody>
+      <p>This is topic 02 of composite 1.</p>
+      <p>Crossref to topic 01: <xref href="#topic_zdk_stw_k5" format="dita"/>.</p>
+    </conbody>
+  </concept>
+  <concept id="concept_dl5_wtw_k5">
+    <title>Topic 03 of Composite 01</title>
+    <conbody>
+      <p>This is topic 03 of composite 01.</p>
+      <p>Conref to paragraph from topic 01:</p>
+      <p conref="#topic_zdk_stw_k5/p01"/>
+    </conbody>
+    <task id="task_u1z_15w_k5">
+      <title>This is Topic 04 of Composite 01</title>
+      <taskbody>
+        <context>This is topic 04 of composite 01</context>
+        <steps id="steps_l44_c5w_k5">
+          <step>
+            <cmd>Do a thing</cmd>
+          </step>
+        </steps>
+      </taskbody>
+      <task id="task_vcm_f5w_k5">
+        <title>Nested topic 04-01</title>
+        <taskbody>
+          <steps-unordered id="steps-unordered_wcm_f5w_k5">
+            <step>
+              <cmd>Do another thing</cmd>
+            </step>
+          </steps-unordered>
+        </taskbody>
+      </task>
+      <task id="task_izm_d5w_k5">
+        <title>Nested topic 04-02</title>
+        <taskbody>
+          <steps-unordered id="steps-unordered_tmq_25w_k5">
+            <step>
+              <cmd>Do yet another thing</cmd>
+            </step>
+          </steps-unordered>
+        </taskbody>
+      </task>
+    </task>
+  </concept>
+</dita>
