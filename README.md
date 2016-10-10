@@ -2,7 +2,7 @@ dita-utilities
 ==============
 
 Random utilities for doing things with DITA, mostly XSLT transforms
-but some XQuery too
+but some XQuery too.
 
 Topic Burster
 -------------
@@ -47,7 +47,7 @@ generated topic.
 The generated topics are grouped into subdirectories with a specified
 number of topics in each subdirectory.
 
-Code is under src/xslt/generate-large-datase
+Code is under `src/xslt/generate-large-datase`
 
 XSLT runtime parameters:
 
@@ -74,7 +74,7 @@ the result, meaning that they won't resolve until the copy is used to
 replace the original maps (or the other files are moved to the same
 location relative to the copy as they are to the original).
 
-Code is under src/xslt/make-keydefs
+Code is under `src/xslt/make-keydefs`
 
 XSLT runtime parameters:
 
@@ -93,19 +93,18 @@ to modify or enhance them.  Can be used as the basis for new transorms.
 Renames maps to make all filenames unique and add title-only topics
 for submap titles.
 
-Code is under src/xslt/map-to-map-transform
+Code is under `src/xslt/map-to-map-transform`
 
 XSLT runtime parameters:
 
-* outputPath: The output directory to use.  Must be specified
+* outputPath: The output directory to use.  Must be specified.
 * namePrefix: Prefix to use for generated names.  Must be specified.
 
 Filter Attributes XQuery Module
 -------------------------------
 
-XQuery update script to remove
-@domains and @class attributes
-from DITA documents.
+XQuery update script to remove @domains and @class attributes from
+DITA documents.
 
 To set up an Oxygen transform:
 
@@ -116,7 +115,7 @@ To set up an Oxygen transform:
 4. Select `Saxon EE` as the Transformer.
 5. Click the little gear icon to bring up the Saxon options and make
    sure the "`Use linked tree model`" option is checked.  This is
-   required for Saxon to do XQuery updates
+   required for Saxon to do XQuery updates.
 
 Code is in `src/xquery/filter-attributes`
 
@@ -127,7 +126,7 @@ Code examples
 
 In: `src/xslt/excel-xml-to-dita-table`
 
-An example on how to convert a Excel XML 2004 to a DITA table
+An example on how to convert a Excel XML 2004 to a DITA table.
 
 
 Submodules
@@ -144,20 +143,22 @@ for a specific documention using a server-side language like PHP.
 ### org.uottawa.brand
 
 An example of a customization of the pdf2 plugin of the DITA-OT.
-**important:** it only works with Antenna House formatter
+
+**important:** This only works with Antenna House formatter.
 
 
 ### org.uottawa.logs
 
-A simple plugins that logs each call of the DITA-OT per date and transtype.
+A simple plugin that logs each call of the DITA-OT per date and
+transtype.
 
 
 ### org.uottawa.report
 
-Few tests to extracts information on your documentation.  It is a
+A few tests to extracts information on your documentation.  It is a
 plugin that parse your documentation and generate a DITA documentation
 from it.  For now the plugin creates:
 
-* keydef documentation: one page per keydef on your documentation
+* keydef documentation: one page per keydef on your documentation.
 * audiences analysis: a table that shows which audience has been
-  applied on which topic
+  applied on which topic.
