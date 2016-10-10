@@ -10,7 +10,7 @@ Takes a single XML document containing multiple DITA topics, either a topic docu
 with multiple sibling topics, and "bursts" the topics to separate files and also generates a map that references the burst topics.
 Provides the option to limit the depth of bursting.
 
-Enhancements generously made possible by The Content Era[http://thecontentera.com].
+Enhancements generously made possible by [The Content Era](http://thecontentera.com).
 
 Code is under src/xslt/burst-topics.
 
